@@ -21,19 +21,10 @@ export default function TaskManagementPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Top Header & New Task Action */}
         <TaskHeader />
-
-        {/* Task Metric Statistics */}
         <TaskStats tasks={data?.tasks || []} total={data?.total || 0} />
-
-        {/* Search, Filter Pills & Sorting */}
         <TaskFilters />
-
-        {/* Responsive Grid List with Loading/Empty states */}
         <TaskList tasks={data?.tasks || []} isLoading={isLoading} />
-
-        {/* Pagination Controls */}
         {data && (
           <TaskPagination
             currentPage={data.page}
@@ -43,8 +34,6 @@ export default function TaskManagementPage() {
             onPageChange={setPage}
           />
         )}
-
-        {/* Modals & Slide-over Drawers */}
         <TaskFormModal />
         <TaskDrawer />
         <DeleteConfirmModal />

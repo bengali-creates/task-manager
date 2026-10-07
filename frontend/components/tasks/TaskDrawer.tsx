@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Calendar, Clock, Edit, Trash2, CheckCircle2, PlayCircle, AlertCircle } from "lucide-react";
+import { Calendar, Clock, Edit, Trash2, CheckCircle2, PlayCircle } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -86,7 +86,6 @@ export function TaskDrawer() {
             </SheetDescription>
           </SheetHeader>
 
-          {/* Quick Status Bar */}
           <div className="py-4 border-b space-y-2">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Current Status
@@ -122,7 +121,6 @@ export function TaskDrawer() {
             </div>
           </div>
 
-          {/* Description */}
           <div className="py-4 border-b space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Description
@@ -132,7 +130,6 @@ export function TaskDrawer() {
             </p>
           </div>
 
-          {/* Metadata Grid */}
           <div className="py-4 space-y-3 text-xs">
             <div className="flex items-center justify-between text-muted-foreground">
               <span className="flex items-center gap-1.5">

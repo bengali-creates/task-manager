@@ -2,24 +2,20 @@ import { create } from "zustand";
 import { Task, TaskFilters, TaskPriority, TaskStatus } from "@/types/task";
 
 interface TaskStoreState {
-  // Modal & Drawer UI states
   isCreateOpen: boolean;
   isEditOpen: boolean;
   isDetailsOpen: boolean;
   isDeleteOpen: boolean;
   selectedTask: Task | null;
 
-  // Filter & Pagination states
   filters: TaskFilters;
 
-  // Modal actions
   openCreate: () => void;
   openEdit: (task: Task) => void;
   openDetails: (task: Task) => void;
   openDelete: (task: Task) => void;
   closeAllModals: () => void;
 
-  // Filter actions
   setSearch: (search: string) => void;
   setStatusFilter: (status: "all" | TaskStatus) => void;
   setPriorityFilter: (priority: "all" | TaskPriority) => void;

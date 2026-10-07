@@ -3,7 +3,6 @@ import { TaskFormData } from "@/lib/schemas/taskSchema";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-// Fallback seed data in case backend is not running yet during initial frontend development
 let mockTasks: Task[] = [
   {
     id: "1",
@@ -76,11 +75,8 @@ export async function fetchTasks(filters: TaskFilters): Promise<TaskListResponse
     if (res.ok) {
       return await res.json();
     }
-  } catch {
-    // If backend isn't running, gracefully serve from mock memory
-  }
+  } catch {}
 
-  // Local fallback processing
   let filtered = [...mockTasks];
 
   if (filters.search) {
@@ -98,7 +94,6 @@ export async function fetchTasks(filters: TaskFilters): Promise<TaskListResponse
     filtered = filtered.filter((t) => t.priority === filters.priority);
   }
 
-  // Sorting
   filtered.sort((a, b) => {
     let comparison = 0;
     if (filters.sortBy === "createdAt") {
@@ -133,9 +128,7 @@ export async function fetchTaskById(id: string): Promise<Task> {
     if (res.ok) {
       return await res.json();
     }
-  } catch {
-    // Fallback
-  }
+  } catch {}
 
   const found = mockTasks.find((t) => t.id === id);
   if (!found) throw new Error("Task not found");
@@ -152,9 +145,7 @@ export async function createTask(data: TaskFormData): Promise<Task> {
     if (res.ok) {
       return await res.json();
     }
-  } catch {
-    // Fallback
-  }
+  } catch {}
 
   const newTask: Task = {
     id: String(Date.now()),
@@ -181,9 +172,7 @@ export async function updateTask(id: string, data: Partial<TaskFormData>): Promi
     if (res.ok) {
       return await res.json();
     }
-  } catch {
-    // Fallback
-  }
+  } catch {}
 
   const index = mockTasks.findIndex((t) => t.id === id);
   if (index === -1) throw new Error("Task not found");
@@ -203,9 +192,7 @@ export async function deleteTask(id: string): Promise<void> {
     if (res.ok) {
       return;
     }
-  } catch {
-    // Fallback
-  }
+  } catch {}
 
   mockTasks = mockTasks.filter((t) => t.id !== id);
 }

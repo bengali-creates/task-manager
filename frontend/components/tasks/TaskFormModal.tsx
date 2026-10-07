@@ -107,7 +107,6 @@ export function TaskFormModal() {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {/* Title */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Task Title <span className="text-destructive">*</span>
@@ -125,7 +124,6 @@ export function TaskFormModal() {
             )}
           </div>
 
-          {/* Description */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Description <span className="text-destructive">*</span>
@@ -144,9 +142,7 @@ export function TaskFormModal() {
             )}
           </div>
 
-          {/* Status & Priority Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Status */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Status
@@ -167,7 +163,6 @@ export function TaskFormModal() {
               </select>
             </div>
 
-            {/* Priority */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Priority
@@ -189,7 +184,6 @@ export function TaskFormModal() {
             </div>
           </div>
 
-          {/* Due Date */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Due Date

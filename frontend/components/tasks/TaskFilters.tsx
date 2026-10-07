@@ -40,9 +40,7 @@ export function TaskFilters() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Search and Sort Row */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Search Input */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
           <Input
@@ -62,9 +60,7 @@ export function TaskFilters() {
           )}
         </div>
 
-        {/* Priority & Sort Dropdowns */}
         <div className="flex items-center gap-2">
-          {/* Priority Filter */}
           <select
             value={filters.priority}
             onChange={(e) => setPriorityFilter(e.target.value as "all" | TaskPriority)}
@@ -77,7 +73,6 @@ export function TaskFilters() {
             <option value="low">Low Priority</option>
           </select>
 
-          {/* Sort By Field */}
           <select
             value={filters.sortBy}
             onChange={(e) =>
@@ -91,7 +86,6 @@ export function TaskFilters() {
             <option value="priority">Priority</option>
           </select>
 
-          {/* Sort Order Toggle */}
           <Button
             variant="outline"
             size="icon"
@@ -118,7 +112,6 @@ export function TaskFilters() {
         </div>
       </div>
 
-      {/* Status Filter Pills */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
         {statusOptions.map((opt) => {
           const isActive = filters.status === opt.value;
