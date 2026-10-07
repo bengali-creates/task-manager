@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTask, deleteTask, fetchTasks, updateTask } from "@/lib/api";
 import { TaskFilters } from "@/types/task";
 import { TaskFormData } from "@/lib/schemas/taskSchema";
@@ -7,6 +7,28 @@ export function useTasks(filters: TaskFilters) {
   return useQuery({
     queryKey: ["tasks", filters],
     queryFn: () => fetchTasks(filters),
+  });
+}
+
+export function useInfiniteTasks(filters: TaskFilters) {
+  return useInfiniteQuery({
+    queryKey: [
+      "tasks",
+      "infinite",
+      filters.search,
+      filters.status,
+      filters.priority,
+      filters.sortBy,
+      filters.order,
+    ],
+    queryFn: ({ pageParam = 1 }) => fetchTasks({ ...filters, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
   });
 }
 

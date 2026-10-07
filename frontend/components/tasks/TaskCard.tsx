@@ -1,18 +1,11 @@
 "use client";
 
 import React from "react";
-import { Calendar, MoreVertical, Eye, Pencil, Trash2, CheckCircle2, Clock, PlayCircle } from "lucide-react";
+import { Calendar, Pencil, Trash2, CheckCircle2, Clock, PlayCircle } from "lucide-react";
 import { Task } from "@/types/task";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { useTaskStore } from "@/store/useTaskStore";
 
 interface TaskCardProps {
@@ -84,7 +77,26 @@ export function TaskCard({ task }: TaskCardProps) {
     : null;
 
   return (
-    <Card className="flex flex-col justify-between transition-all hover:shadow-md border-border/80">
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={() => openDetails(task)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openDetails(task);
+        }
+      }}
+      className="group relative flex flex-col justify-between overflow-hidden cursor-pointer border border-border/80 transition-all duration-300 ease-out hover:border-primary/60 hover:shadow-lg hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      <span className="pointer-events-none absolute top-0 left-0 h-3 w-3 rounded-tl border-t-2 border-l-2 border-primary opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out" />
+      <span className="pointer-events-none absolute top-0 right-0 h-3 w-3 rounded-tr border-t-2 border-r-2 border-primary opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out" />
+      <span className="pointer-events-none absolute bottom-0 left-0 h-3 w-3 rounded-bl border-b-2 border-l-2 border-primary opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out" />
+      <span className="pointer-events-none absolute bottom-0 right-0 h-3 w-3 rounded-br border-b-2 border-r-2 border-primary opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out" />
+
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -92,44 +104,37 @@ export function TaskCard({ task }: TaskCardProps) {
             {getPriorityBadge(task.priority)}
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="text-muted-foreground hover:text-foreground"
-                  aria-label="Task options"
-                >
-                  <MoreVertical className="size-4" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => openDetails(task)}>
-                <Eye className="size-4 mr-2" />
-                <span>View Details</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openEdit(task)}>
-                <Pencil className="size-4 mr-2" />
-                <span>Edit Task</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => openDelete(task)}
-              >
-                <Trash2 className="size-4 mr-2" />
-                <span>Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                openEdit(task);
+              }}
+              className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+              aria-label="Edit task"
+              title="Edit task"
+            >
+              <Pencil className="size-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                openDelete(task);
+              }}
+              className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              aria-label="Delete task"
+              title="Delete task"
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          </div>
         </div>
 
-        <CardTitle
-          onClick={() => openDetails(task)}
-          className="mt-2 line-clamp-1 cursor-pointer text-base font-semibold hover:underline"
-        >
+        <CardTitle className="mt-2 line-clamp-1 text-base font-semibold group-hover:text-primary transition-colors">
           {task.title}
         </CardTitle>
         <CardDescription className="line-clamp-2 text-xs leading-relaxed">
@@ -148,7 +153,10 @@ export function TaskCard({ task }: TaskCardProps) {
         <Button
           variant="ghost"
           size="xs"
-          onClick={() => openDetails(task)}
+          onClick={(e) => {
+            e.stopPropagation();
+            openDetails(task);
+          }}
           className="text-xs hover:text-foreground"
         >
           View
