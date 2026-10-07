@@ -12,10 +12,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import GlideSelect from "@/components/ui/GlideSelect";
 import { useTaskStore } from "@/store/useTaskStore";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { TaskFormData, taskFormSchema } from "@/lib/schemas/taskSchema";
 import { TaskPriority, TaskStatus } from "@/types/task";
+
+const statusOptions = [
+  { value: "pending", label: "Pending", tag: "To Do" },
+  { value: "in_progress", label: "In Progress", tag: "Active" },
+  { value: "completed", label: "Completed", tag: "Done" },
+];
+
+const priorityOptions = [
+  { value: "low", label: "Low Priority", tag: "Low" },
+  { value: "medium", label: "Medium Priority", tag: "Normal" },
+  { value: "high", label: "High Priority", tag: "Urgent" },
+];
 
 export function TaskFormModal() {
   const isCreateOpen = useTaskStore((state) => state.isCreateOpen);
@@ -142,45 +155,61 @@ export function TaskFormModal() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5 flex flex-col">
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Status
               </label>
-              <select
+              <GlideSelect
+                options={statusOptions}
                 value={formData.status}
-                onChange={(e) =>
+                onChange={(val) =>
                   setFormData((prev) => ({
                     ...prev,
-                    status: e.target.value as TaskStatus,
+                    status: val as TaskStatus,
                   }))
                 }
-                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-              </select>
+                ariaLabel="Select task status"
+                surfaceColor="var(--background)"
+                highlightColor="var(--muted)"
+                textColor="var(--foreground)"
+                accentColor="var(--primary)"
+                size="md"
+                radius={8}
+                menuWidth={210}
+                placement="bottom"
+                align="left"
+                showTags
+                className="w-full [&>button]:w-full [&>button]:justify-between [&>button]:h-9"
+              />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 flex flex-col">
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Priority
               </label>
-              <select
+              <GlideSelect
+                options={priorityOptions}
                 value={formData.priority}
-                onChange={(e) =>
+                onChange={(val) =>
                   setFormData((prev) => ({
                     ...prev,
-                    priority: e.target.value as TaskPriority,
+                    priority: val as TaskPriority,
                   }))
                 }
-                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="low">Low Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="high">High Priority</option>
-              </select>
+                ariaLabel="Select task priority"
+                surfaceColor="var(--background)"
+                highlightColor="var(--muted)"
+                textColor="var(--foreground)"
+                accentColor="var(--primary)"
+                size="md"
+                radius={8}
+                menuWidth={210}
+                placement="bottom"
+                align="left"
+                showTags
+                className="w-full [&>button]:w-full [&>button]:justify-between [&>button]:h-9"
+              />
             </div>
           </div>
 
