@@ -12,7 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Plus, Pencil } from "lucide-react";
 import GlideSelect from "@/components/ui/GlideSelect";
+import FuseButton from "@/components/ui/FuseButton";
 import { useTaskStore } from "@/store/useTaskStore";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { TaskFormData, taskFormSchema } from "@/lib/schemas/taskSchema";
@@ -25,9 +27,9 @@ const statusOptions = [
 ];
 
 const priorityOptions = [
-  { value: "low", label: "Low Priority", tag: "Low" },
-  { value: "medium", label: "Medium Priority", tag: "Normal" },
   { value: "high", label: "High Priority", tag: "Urgent" },
+  { value: "medium", label: "Medium Priority", tag: "Normal" },
+  { value: "low", label: "Low Priority", tag: "Low" },
 ];
 
 export function TaskFormModal() {
@@ -73,9 +75,7 @@ export function TaskFormModal() {
     setErrors({});
   }, [isEditMode, selectedTask, isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const executeSubmit = async () => {
     const result = taskFormSchema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -85,7 +85,7 @@ export function TaskFormModal() {
         }
       });
       setErrors(fieldErrors);
-      return;
+      return false;
     }
 
     setErrors({});
@@ -100,9 +100,16 @@ export function TaskFormModal() {
         await createTaskMutation.mutateAsync(result.data);
       }
       closeAllModals();
+      return true;
     } catch (err) {
       console.error("Failed to save task:", err);
+      return false;
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await executeSubmit();
   };
 
   const isSubmitting = createTaskMutation.isPending || updateTaskMutation.isPending;
@@ -229,22 +236,40 @@ export function TaskFormModal() {
             )}
           </div>
 
-          <DialogFooter className="pt-4 border-t">
+          <DialogFooter className="pt-4 border-t flex items-center justify-end gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={closeAllModals}
               disabled={isSubmitting}
+              className="rounded-full"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting
-                ? "Saving..."
-                : isEditMode
-                ? "Update Task"
-                : "Create Task"}
-            </Button>
+            {isEditMode ? (
+              <FuseButton
+                label={isSubmitting ? "Saving..." : "Update Task"}
+                icon={<Pencil className="size-4 mr-1.5" />}
+                undoLabel="Undo"
+                doneLabel="Updated"
+                color="var(--primary-foreground)"
+                background="var(--primary)"
+                fuseColor="var(--primary-foreground)"
+                size="sm"
+                radius={22}
+                undoWindow={3000}
+                fuse="outline"
+                commitOn="fuseEnd"
+                className="rounded-full font-medium"
+                onFuseEnd={executeSubmit}
+                disabled={isSubmitting}
+              />
+            ) : (
+              <Button type="submit" disabled={isSubmitting} className="rounded-full font-medium">
+                <Plus className="size-4 mr-1.5" />
+                {isSubmitting ? "Saving..." : "Create Task"}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

@@ -14,6 +14,7 @@ interface TaskStoreState {
   openEdit: (task: Task) => void;
   openDetails: (task: Task) => void;
   openDelete: (task: Task) => void;
+  updateSelectedTask: (updates: Partial<Task>) => void;
   closeAllModals: () => void;
 
   setSearch: (search: string) => void;
@@ -67,6 +68,11 @@ export const useTaskStore = create<TaskStoreState>((set) => ({
       isDeleteOpen: true,
       selectedTask: task,
     }),
+
+  updateSelectedTask: (updates) =>
+    set((state) => ({
+      selectedTask: state.selectedTask ? { ...state.selectedTask, ...updates } : null,
+    })),
 
   closeAllModals: () =>
     set({

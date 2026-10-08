@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Calendar, Clock, Edit, Trash2, CheckCircle2, PlayCircle } from "lucide-react";
+import { Calendar, Clock, CheckCircle2, PlayCircle, Pencil, Trash2 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -10,33 +10,41 @@ import {
   SheetDescription,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import HoldButton from "@/components/ui/HoldButton";
+import FuseButton from "@/components/ui/FuseButton";
+import WarmTooltip, { WarmTooltipGroup } from "@/components/ui/WarmTooltip";
 import { useTaskStore } from "@/store/useTaskStore";
-import { useUpdateTask } from "@/hooks/useTasks";
+import { useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { TaskStatus } from "@/types/task";
 
 export function TaskDrawer() {
   const isDetailsOpen = useTaskStore((state) => state.isDetailsOpen);
   const selectedTask = useTaskStore((state) => state.selectedTask);
+  const updateSelectedTask = useTaskStore((state) => state.updateSelectedTask);
   const closeAllModals = useTaskStore((state) => state.closeAllModals);
   const openEdit = useTaskStore((state) => state.openEdit);
-  const openDelete = useTaskStore((state) => state.openDelete);
 
   const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
 
   if (!selectedTask) return null;
 
   const handleQuickStatusChange = async (newStatus: TaskStatus) => {
     if (newStatus === selectedTask.status) return;
+    const previousStatus = selectedTask.status;
+    updateSelectedTask({ status: newStatus });
     try {
-      await updateTaskMutation.mutateAsync({
+      const updated = await updateTaskMutation.mutateAsync({
         id: selectedTask.id,
         data: { status: newStatus },
       });
-      closeAllModals();
+      if (updated) {
+        updateSelectedTask(updated);
+      }
     } catch (err) {
       console.error(err);
+      updateSelectedTask({ status: previousStatus });
     }
   };
 
@@ -65,26 +73,29 @@ export function TaskDrawer() {
         <div className="space-y-6">
           <SheetHeader className="p-0 space-y-3 pb-5 border-b border-border/60">
             <div className="flex flex-wrap items-center gap-2 pr-8">
-              <Badge variant="outline" className="text-[10px] font-mono tracking-wider px-2 py-0.5 bg-muted/50">
+              <Badge variant="outline" className="text-[10px] font-mono tracking-wider px-2 py-0.5 bg-muted/50 rounded-full">
                 ID: {selectedTask.id.slice(0, 8)}
               </Badge>
               {selectedTask.priority === "high" && (
-                <Badge variant="destructive" className="uppercase text-[10px] tracking-wider font-semibold">
+                <Badge
+                  variant="outline"
+                  className="uppercase text-[10px] tracking-wider font-semibold border-rose-500/30 text-rose-600 dark:text-rose-400 bg-rose-500/10 rounded-full"
+                >
                   High Priority
                 </Badge>
               )}
               {selectedTask.priority === "medium" && (
                 <Badge
                   variant="outline"
-                  className="uppercase text-[10px] tracking-wider font-semibold border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10"
+                  className="uppercase text-[10px] tracking-wider font-semibold border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 rounded-full"
                 >
                   Medium Priority
                 </Badge>
               )}
               {selectedTask.priority === "low" && (
                 <Badge
-                  variant="secondary"
-                  className="uppercase text-[10px] tracking-wider font-semibold text-muted-foreground"
+                  variant="outline"
+                  className="uppercase text-[10px] tracking-wider font-semibold border-sky-500/30 text-sky-600 dark:text-sky-400 bg-sky-500/10 rounded-full"
                 >
                   Low Priority
                 </Badge>
@@ -92,7 +103,7 @@ export function TaskDrawer() {
               {selectedTask.status === "completed" && (
                 <Badge
                   variant="secondary"
-                  className="gap-1 border font-normal text-[11px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                  className="gap-1 border font-normal text-[11px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 rounded-full"
                 >
                   <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
                   <span>Completed</span>
@@ -101,14 +112,14 @@ export function TaskDrawer() {
               {selectedTask.status === "in_progress" && (
                 <Badge
                   variant="default"
-                  className="gap-1 font-normal text-[11px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                  className="gap-1 font-normal text-[11px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full"
                 >
                   <PlayCircle className="size-3 text-blue-600 dark:text-blue-400" />
                   <span>In Progress</span>
                 </Badge>
               )}
               {selectedTask.status === "pending" && (
-                <Badge variant="outline" className="gap-1 font-normal text-[11px]">
+                <Badge variant="outline" className="gap-1 font-normal text-[11px] rounded-full">
                   <Clock className="size-3 text-muted-foreground" />
                   <span>Pending</span>
                 </Badge>
@@ -124,38 +135,104 @@ export function TaskDrawer() {
           </SheetHeader>
 
           <div className="space-y-2.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Current Status
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                variant={selectedTask.status === "pending" ? "default" : "outline"}
-                size="sm"
-                className="text-xs h-9 font-medium transition-all"
-                onClick={() => handleQuickStatusChange("pending")}
-              >
-                <Clock className="size-3.5 mr-1.5" />
-                Pending
-              </Button>
-              <Button
-                variant={selectedTask.status === "in_progress" ? "default" : "outline"}
-                size="sm"
-                className="text-xs h-9 font-medium transition-all"
-                onClick={() => handleQuickStatusChange("in_progress")}
-              >
-                <PlayCircle className="size-3.5 mr-1.5" />
-                Progress
-              </Button>
-              <Button
-                variant={selectedTask.status === "completed" ? "default" : "outline"}
-                size="sm"
-                className="text-xs h-9 font-medium transition-all"
-                onClick={() => handleQuickStatusChange("completed")}
-              >
-                <CheckCircle2 className="size-3.5 mr-1.5" />
-                Done
-              </Button>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Current Status
+              </label>
+              <span className="text-[11px] text-muted-foreground font-normal">
+                Hold 2s to switch
+              </span>
             </div>
+            <WarmTooltipGroup delay={200} warmWindow={300}>
+              <div className="grid grid-cols-3 gap-2">
+                <WarmTooltip
+                  content={selectedTask.status === "pending" ? "Active: Pending" : "Hold 2s to set as Pending"}
+                  side="top"
+                  surfaceColor="var(--popover)"
+                  inkColor="var(--popover-foreground)"
+                >
+                  <HoldButton
+                    holdTime={2000}
+                    releaseTime={200}
+                    size="sm"
+                    radius={18}
+                    backgroundColor={selectedTask.status === "pending" ? "#18181b" : "var(--muted)"}
+                    fillColor="#64748b"
+                    textColor={selectedTask.status === "pending" ? "#ffffff" : "var(--foreground)"}
+                    fillTextColor="#ffffff"
+                    icon={<Clock className="size-3.5 mr-1" />}
+                    doneIcon={<Clock className="size-3.5 mr-1" />}
+                    doneLabel="Pending"
+                    onHold={() => handleQuickStatusChange("pending")}
+                    className={`w-full justify-center rounded-full transition-all ${
+                      selectedTask.status === "pending"
+                        ? "ring-2 ring-foreground/20 font-semibold shadow-sm"
+                        : "opacity-85 hover:opacity-100"
+                    }`}
+                  >
+                    Pending
+                  </HoldButton>
+                </WarmTooltip>
+
+                <WarmTooltip
+                  content={selectedTask.status === "in_progress" ? "Active: In Progress" : "Hold 2s to set as In Progress"}
+                  side="top"
+                  surfaceColor="var(--popover)"
+                  inkColor="var(--popover-foreground)"
+                >
+                  <HoldButton
+                    holdTime={2000}
+                    releaseTime={200}
+                    size="sm"
+                    radius={18}
+                    backgroundColor={selectedTask.status === "in_progress" ? "#2563eb" : "var(--muted)"}
+                    fillColor="#1d4ed8"
+                    textColor={selectedTask.status === "in_progress" ? "#ffffff" : "var(--foreground)"}
+                    fillTextColor="#ffffff"
+                    icon={<PlayCircle className="size-3.5 mr-1" />}
+                    doneIcon={<PlayCircle className="size-3.5 mr-1" />}
+                    doneLabel="In Progress"
+                    onHold={() => handleQuickStatusChange("in_progress")}
+                    className={`w-full justify-center rounded-full transition-all ${
+                      selectedTask.status === "in_progress"
+                        ? "ring-2 ring-blue-500/40 font-semibold shadow-sm"
+                        : "opacity-85 hover:opacity-100"
+                    }`}
+                  >
+                    In Progress
+                  </HoldButton>
+                </WarmTooltip>
+
+                <WarmTooltip
+                  content={selectedTask.status === "completed" ? "Active: Completed" : "Hold 2s to set as Completed"}
+                  side="top"
+                  surfaceColor="var(--popover)"
+                  inkColor="var(--popover-foreground)"
+                >
+                  <HoldButton
+                    holdTime={2000}
+                    releaseTime={200}
+                    size="sm"
+                    radius={18}
+                    backgroundColor={selectedTask.status === "completed" ? "#16a34a" : "var(--muted)"}
+                    fillColor="#15803d"
+                    textColor={selectedTask.status === "completed" ? "#ffffff" : "var(--foreground)"}
+                    fillTextColor="#ffffff"
+                    icon={<CheckCircle2 className="size-3.5 mr-1" />}
+                    doneIcon={<CheckCircle2 className="size-3.5 mr-1" />}
+                    doneLabel="Completed"
+                    onHold={() => handleQuickStatusChange("completed")}
+                    className={`w-full justify-center rounded-full transition-all ${
+                      selectedTask.status === "completed"
+                        ? "ring-2 ring-emerald-500/40 font-semibold shadow-sm"
+                        : "opacity-85 hover:opacity-100"
+                    }`}
+                  >
+                    Completed
+                  </HoldButton>
+                </WarmTooltip>
+              </div>
+            </WarmTooltipGroup>
           </div>
 
           <div className="space-y-2">
@@ -197,30 +274,50 @@ export function TaskDrawer() {
         </div>
 
         <SheetFooter className="p-0 pt-6 mt-6 border-t border-border/60 flex flex-row items-center gap-3">
-          <Button
-            variant="outline"
-            className="flex-1 h-10 font-medium hover:bg-muted"
-            onClick={() => {
+          <FuseButton
+            label="Edit Task"
+            icon={<Pencil className="size-4" />}
+            undoLabel="Undo"
+            doneLabel="Opening..."
+            color="var(--foreground)"
+            background="var(--muted)"
+            fuseColor="var(--primary)"
+            size="sm"
+            radius={22}
+            undoWindow={2500}
+            fuse="outline"
+            commitOn="fuseEnd"
+            className="flex-1 rounded-full font-medium"
+            onFuseEnd={() => {
               const taskToEdit = selectedTask;
               closeAllModals();
               openEdit(taskToEdit);
             }}
-          >
-            <Edit className="size-4 mr-1.5" />
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            className="flex-1 h-10 font-medium"
-            onClick={() => {
-              const taskToDelete = selectedTask;
-              closeAllModals();
-              openDelete(taskToDelete);
+          />
+          <FuseButton
+            label="Delete Task"
+            icon={<Trash2 className="size-4" />}
+            undoLabel="Undo"
+            doneLabel="Deleted"
+            color="#ef4444"
+            background="color-mix(in srgb, #ef4444 12%, transparent)"
+            fuseColor="#ef4444"
+            size="sm"
+            radius={22}
+            undoWindow={3500}
+            fuse="outline"
+            fuseThickness={2}
+            commitOn="fuseEnd"
+            className="flex-1 rounded-full font-medium"
+            onFuseEnd={async () => {
+              try {
+                await deleteTaskMutation.mutateAsync(selectedTask.id);
+                closeAllModals();
+              } catch (err) {
+                console.error(err);
+              }
             }}
-          >
-            <Trash2 className="size-4 mr-1.5" />
-            Delete
-          </Button>
+          />
         </SheetFooter>
       </SheetContent>
     </Sheet>

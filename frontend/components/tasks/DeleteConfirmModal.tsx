@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -8,9 +9,9 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import FuseButton from "@/components/ui/FuseButton";
 import { useTaskStore } from "@/store/useTaskStore";
 import { useDeleteTask } from "@/hooks/useTasks";
 
@@ -45,17 +46,32 @@ export function DeleteConfirmModal() {
             ? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={closeAllModals} disabled={deleteTaskMutation.isPending}>
+        <AlertDialogFooter className="flex items-center gap-2">
+          <AlertDialogCancel
+            onClick={closeAllModals}
+            disabled={deleteTaskMutation.isPending}
+            className="rounded-full"
+          >
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction
-            variant="destructive"
-            onClick={handleDelete}
+          <FuseButton
+            label={deleteTaskMutation.isPending ? "Deleting..." : "Delete Task"}
+            icon={<Trash2 className="size-4" />}
+            undoLabel="Undo"
+            doneLabel="Deleted"
+            color="#ffffff"
+            background="oklch(0.577 0.245 27.325)"
+            fuseColor="#ffffff"
+            size="sm"
+            radius={22}
+            undoWindow={3500}
+            fuse="outline"
+            fuseThickness={2}
+            commitOn="fuseEnd"
+            className="rounded-full font-medium"
+            onFuseEnd={handleDelete}
             disabled={deleteTaskMutation.isPending}
-          >
-            {deleteTaskMutation.isPending ? "Deleting..." : "Delete Task"}
-          </AlertDialogAction>
+          />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

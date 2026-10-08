@@ -48,20 +48,29 @@ export function TaskCard({ task }: TaskCardProps) {
     switch (priority) {
       case "high":
         return (
-          <Badge variant="destructive" className="font-normal uppercase text-[10px] tracking-wider">
+          <Badge
+            variant="outline"
+            className="font-normal uppercase text-[10px] tracking-wider border-rose-500/30 text-rose-600 dark:text-rose-400 bg-rose-500/10"
+          >
             High
           </Badge>
         );
       case "medium":
         return (
-          <Badge variant="outline" className="font-normal uppercase text-[10px] tracking-wider">
+          <Badge
+            variant="outline"
+            className="font-normal uppercase text-[10px] tracking-wider border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10"
+          >
             Medium
           </Badge>
         );
       case "low":
       default:
         return (
-          <Badge variant="secondary" className="font-normal uppercase text-[10px] tracking-wider">
+          <Badge
+            variant="outline"
+            className="font-normal uppercase text-[10px] tracking-wider border-sky-500/30 text-sky-600 dark:text-sky-400 bg-sky-500/10"
+          >
             Low
           </Badge>
         );
